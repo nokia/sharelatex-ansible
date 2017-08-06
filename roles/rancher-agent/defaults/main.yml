@@ -1,0 +1,7 @@
+---
+rancher_server: "{{ groups['headnodes']|map('extract', hostvars, ['ansible_default_ipv4', 'address']) | first }}"
+rancher_port: 8080
+rancher_agent_name: "agent"
+rancher_agent_version: 0.11.0
+rancher_agent_instance_version: 0.8.3
+rancher_agent_type: "none"

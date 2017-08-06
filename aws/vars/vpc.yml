@@ -1,0 +1,16 @@
+vpc_name: sharelatex
+vpc_region: us-east-1
+vpc_cidr_block: 192.168.0.0/16
+vpc_subnet_1: 192.168.8.0/24
+vpc_az_1: "{{vpc_region}}e"
+
+vpc_subnets:
+  - cidr: "{{ vpc_subnet_1 }}"
+    az: "{{ vpc_az_1 }}"
+    resource_tags: { "Name":"{{ vpc_name }}-{{ vpc_az_1 }}-subnet" }
+vpc_route_tables:
+  - subnets:
+      - "{{ vpc_subnet_1 }}"
+    routes:
+      - dest: 0.0.0.0/0
+        gw: igw

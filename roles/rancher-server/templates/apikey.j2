@@ -1,0 +1,3 @@
+export RANCHER_URL=http://{{ ansible_default_ipv4.address }}:{{ rancher_port }}
+export RANCHER_ACCESS_KEY={{ rancherkeys.json['publicValue'] }}
+export RANCHER_SECRET_KEY={{ rancherkeys.json['secretValue'] }}

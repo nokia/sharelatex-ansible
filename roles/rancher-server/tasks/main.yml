@@ -1,0 +1,30 @@
+---
+- pip: name=docker-py
+- name: Pull and run the Rancher/server container
+  docker:
+      name: "{{ rancher_name }}-v1"
+      image: rancher/server
+      restart_policy: always
+      ports:
+        - "{{ rancher_port }}:8080"
+      env:
+        CATTLE_AGENT_INSTANCE_IMAGE: "mic92/agent-instance:v{{ rancher_agent_instance_version }}"
+
+- name: Wait for the Rancher server to start
+  wait_for: port=8080
+
+#- name: Add api key account
+#  uri:
+#    method: POST
+#    status_code: 201
+#    url: http://{{ ansible_default_ipv4.address }}:{{ rancher_port }}/v1/apiKeys
+#    HEADER_User_Agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:44.0) Gecko/20100101 Firefox/44.0"
+#    body : '{"name":"admin","description":"admin"}'
+#    HEADER_Accept: "application/json"
+#    HEADER_Content-Type: "application/json"
+#    return_content: yes
+#  register: rancherkeys
+#
+#- name: Generate apikey configuration
+#  template: src=apikey.j2 dest="{{ lookup('env','HOME') }}/.rancher-credentials"
+#  delegate_to: localhost

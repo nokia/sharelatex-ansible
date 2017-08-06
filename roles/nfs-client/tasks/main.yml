@@ -1,0 +1,7 @@
+- name: Ensure NFS utilities are installed.
+  apt: "name={{ item }} state=installed"
+  with_items:
+    - nfs-common
+- name: Ensure directories to mount exist
+  file: 'path="/mnt/share" state=directory'
+- mount: name=/mnt/share src=192.168.8.18:/data/nfs fstype=nfs opts=soft,timeo=5,retry=5 state=mounted

@@ -1,0 +1,2 @@
+[local]
+localhost ansible_connection=local ansible_user=joerg ansible_become=False ansible_python_interpreter="/run/current-system/sw/bin/python2"

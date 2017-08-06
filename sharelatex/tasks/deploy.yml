@@ -1,0 +1,4 @@
+---
+ - name: Find the current login user
+   command: whoami
+   register: login_user

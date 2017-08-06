@@ -1,0 +1,3 @@
+---
+ image_id: "ami-0903481e"
+ ssh_key_location: ~/.ssh/id_rsa.pub

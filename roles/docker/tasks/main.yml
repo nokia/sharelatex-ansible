@@ -1,0 +1,29 @@
+- name: "add sysdig key"
+  apt_key: url=https://s3.amazonaws.com/download.draios.com/DRAIOS-GPG-KEY.public id=d27a72f32d867df9300a241574490fd6ec51e8c4
+- apt_repository: repo='deb http://download.draios.com/stable/deb stable-$(ARCH)/'
+
+- name: "add docker key"
+  apt_key: keyserver=hkp://p80.pool.sks-keyservers.net:80 id=58118E89F3A912897C070ADBF76221572C52609D
+- apt_repository: repo='deb https://apt.dockerproject.org/repo ubuntu-trusty main'
+
+- name: "/etc/default/docker"
+  copy: src="docker" dest="/etc/default/docker"
+  register: dockerdefault
+
+- file: path=/data/docker state=directory mode=0755
+
+- debug: var=groups['headnodes']
+
+- name: Install list of packages
+  apt: name={{item}} state=latest update_cache=yes cache_valid_time=30
+  with_items:
+    - sysdig
+    - python-pip
+
+- action: apt name=docker-engine state=latest force=yes
+
+- name: restart docker
+  service: name=docker state=restarted
+  when: dockerdefault.changed
+
+- pip: name=docker-py

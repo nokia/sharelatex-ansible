@@ -1,0 +1,18 @@
+- name: Install dnsmasq package
+  apt:
+    name: '{{ item }}'
+    state: 'latest'
+    update_cache: yes
+    cache_valid_time: 30
+  with_items: ['dnsmasq']
+
+- file: path=/etc/dnsmasq.d/hosts state=touch
+- template: src=static-hosts.j2 dest=/etc/dnsmasq.d/static-hosts
+  register: statichosts
+
+- copy: src=dnsmasq.conf dest=/etc/dnsmasq.conf
+  register: dnsmasqconfig
+
+- name: restart dnsmasq
+  service: name=dnsmasq state=restarted
+  when: dnsmasqconfig.changed or statichosts.changed

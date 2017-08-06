@@ -1,0 +1,47 @@
+ - name: Instance | Create the Server Instance
+   local_action:
+     module: ec2
+     region: "{{ vpc_region }}"
+     group: "{{ security_groups[0].sg_name }}"
+     keypair: "{{ key_name }}"
+     instance_type: "{{ instance_type }}"
+     image: "{{ image_id.ami }}"
+     vpc_subnet_id: "{{ item }}"
+     assign_public_ip: True
+     wait: True
+     wait_timeout: 600
+     exact_count: "{{ instance_count }}"
+     volumes:
+      - device_name: /dev/sda1
+        volume_size: "{{ instance_ebs_size }}"
+        delete_on_termination: true
+     count_tag:
+       Role: "{{ instance_role }}"
+     instance_tags:
+       Name: "{{ vpc_name }}_Instance"
+       Role: "{{ instance_role }}"
+   with_items:
+      - "{{ vpc_subnet_1 }}"
+   register: instance
+
+ - name: Instance | Set the Instances facts
+   set_fact:
+     instance_public_dns_name: "{{ instance.results[0].tagged_instances | map(attribute='public_dns_name') | list }}"
+
+ - name: Instance | Wait for SSH to come up
+   local_action:
+     module: wait_for
+     host: "{{ item }}"
+     port: 22
+     state: started
+   with_items:
+     - "{{ instance_public_dns_name }}"
+
+ - name: Instance | Create SSH Group to login dynamically to EC2 Instance
+   add_host:
+     hostname: "{{ item }}"
+     groupname: "{{ instance_role }}"
+     ansible_user: ubuntu
+     become: yes
+   with_items:
+     - "{{ instance_public_dns_name }}"

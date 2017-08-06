@@ -1,0 +1,22 @@
+---
+ - name: Create Security Group
+   local_action:
+     module: ec2_group
+     name: "{{ item.sg_name }}"
+     description: "{{ item.sg_description }}"
+     region: "{{ vpc_region }}" # Change the AWS region here
+     vpc_id: "{{ vpc.vpc_id }}" # vpc is the resgister name, you can also set it manually
+     state: present
+     rules: "{{ item.sg_rules }}"
+   with_items: "{{ security_groups }}"
+   register: sharelatex_sg
+
+ - name: Tag the Security Group with a name
+   local_action:
+     module: ec2_tag
+     resource: "{{ item.group_id}}"
+     region: "{{ vpc_region }}"
+     state: present
+     tags:
+       Name: "{{ vpc_name }}-{{ item.item.sg_name }}"
+   with_items: "{{ sharelatex_sg.results }}"

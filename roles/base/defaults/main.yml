@@ -1,0 +1,9 @@
+---
+
+dns_nameservers: "{{ groups['headnodes']|map('extract', hostvars, ['ansible_default_ipv4', 'address'])|list }}"
+dns_remove_resolvconf: true
+dns_dhclient_rule: "supersede" # can be supersede or prepend
+
+dns_dhclient_file: "/etc/dhcp/dhclient.conf"
+dns_forced_in_dhclientconf: "{{ansible_os_family == 'Debian' or ansible_os_family == 'Redhat'}}"
+ntp_server: false

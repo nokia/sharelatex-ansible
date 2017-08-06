@@ -1,0 +1,39 @@
+- hosts: local
+  connection: local
+  gather_facts: no
+  vars_files:
+    - aws/vars/ami.yml
+    - aws/vars/vpc.yml
+    - aws/vars/securitygroups.yml
+    - aws/vars/ec2_key.yml
+  tasks:
+    - include: aws/tasks/ami.yml
+    - include: aws/tasks/vpc.yml
+    - include: aws/tasks/securitygroups.yml
+    - include: aws/tasks/ec2_key.yml
+    - include: aws/tasks/instance.yml
+      vars:
+        instance_role: "headnodes"
+        instance_type: "t2.large"
+        instance_count: 1
+        instance_ebs_size: "50"
+    - include: aws/tasks/instance.yml
+      vars:
+        instance_role: "applicationnodes"
+        instance_type: "t2.large"
+        instance_count: 5
+        instance_ebs_size: "20"
+    - include: aws/tasks/instance.yml
+      vars:
+        instance_role: "databasenodes"
+        instance_type: "t2.large"
+        instance_count: 1
+        instance_ebs_size: "20"
+- hosts: headnodes
+  roles:
+    - dns
+    - rancher-server
+    - rancher-agent
+- hosts: applicationnodes databasenodes
+  roles:
+    - rancher-agent

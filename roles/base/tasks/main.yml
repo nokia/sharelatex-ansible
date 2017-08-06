@@ -1,0 +1,31 @@
+- name: base | common configuration
+  template: src={{ item.from }}.j2 dest={{ item.to }} mode=0644 backup=no
+  with_items:
+    - { from: hosts, to: /etc/hosts }
+
+- name: base | Remove resolvconf on Debian system
+  apt: pkg=resolvconf state=absent
+  when: ansible_os_family == 'Debian' and dns_remove_resolvconf
+  tags: [packages,dns]
+
+- name: base | Ensure dns servers are configured in /etc/resolv.conf
+  template: src=resolv.conf.j2 dest=/etc/resolv.conf
+  tags: [configuration,dns]
+
+- name: base | Set /etc/timezone to UTC
+  template: dest=/etc/timezone src=timezone.j2
+  notify: update tzdata
+
+- name: base | Install list of packages
+  apt: name={{item}} state=latest state=latest
+  with_items:
+    - ntp
+
+- name: base | ntp.conf
+  template: dest=/etc/ntp.conf src=ntp.j2
+  notify: update tzdata
+  register: ntp
+
+- name: base | restart ntp
+  service: name=ntp state=restarted
+  when: ntp.changed

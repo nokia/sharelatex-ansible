@@ -1,0 +1,9 @@
+- name: Pull and run the registry
+  docker:
+      name: "registry2"
+      image: registry:2
+      restart_policy: always
+      volumes:
+        - /data/registry:/var/lib/registry
+      ports:
+        - "5000:5000"

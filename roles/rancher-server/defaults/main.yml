@@ -1,0 +1,4 @@
+---
+# defaults file for rancher
+rancher_name: 'rangerserver'
+rancher_port: 8080
